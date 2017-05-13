@@ -588,6 +588,122 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/11/markdown/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhengmingzhi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="学武之境">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/05/11/markdown/" itemprop="url">Hexo部署和Markdown使用</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-11T17:35:13+08:00">
+                2017-05-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>  Hexo部署和Markdown标记的使用介绍<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/11/markdown/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/11/springboot/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -655,23 +771,14 @@
 
       
         
-          
-            <h1 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h1><ul>
-<li>一个称手的文本编辑器（例如Vim、Emacs、Sublime Text）或者IDE（Eclipse、Idea Intellij）  </li>
-<li>Java环境（JDK 1.7或以上版本）  </li>
-<li>Maven 3.0+（Eclipse和Idea IntelliJ内置，如果使用IDE并且不使用命令行工具可以不安装）  </li>
-</ul>
-<h1 id="一个最简单的Web应用"><a href="#一个最简单的Web应用" class="headerlink" title="一个最简单的Web应用"></a>一个最简单的Web应用</h1><p>  使用Spring Boot框架可以大大加速Web应用的开发过程，首先在Maven项目依赖中引入spring-boot-starter-web：pom.xml<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;</div><div class="line">  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</div><div class="line"></div><div class="line">  &lt;groupId&gt;com.tianmaying&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;spring-web-demo&lt;/artifactId&gt;</div><div class="line">  &lt;version&gt;0.0.1&lt;/version&gt;</div><div class="line">  &lt;packaging&gt;jar&lt;/packaging&gt;</div><div class="line"></div><div class="line">  &lt;name&gt;springBoot-demo&lt;/name&gt;</div><div class="line">  &lt;description&gt;Demo project for Spring WebMvc&lt;/description&gt;</div><div class="line"></div><div class="line">  &lt;parent&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.5.2.RELEASE&lt;/version&gt;</div><div class="line">    &lt;relativePath/&gt;</div><div class="line">  &lt;/parent&gt;</div><div class="line"></div><div class="line">  &lt;properties&gt;</div><div class="line">    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;</div><div class="line">    &lt;java.version&gt;1.8&lt;/java.version&gt;</div><div class="line">  &lt;/properties&gt;</div><div class="line"></div><div class="line">  &lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">      &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">  &lt;/dependencies&gt;</div><div class="line"></div><div class="line">  &lt;build&gt;</div><div class="line">    &lt;plugins&gt;</div><div class="line">      &lt;plugin&gt;</div><div class="line">        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;</div><div class="line">      &lt;/plugin&gt;</div><div class="line">    &lt;/plugins&gt;</div><div class="line">  &lt;/build&gt;</div><div class="line"></div><div class="line"></div><div class="line">&lt;/project&gt;</div></pre></td></tr></table></figure></p>
-<h2 id="创建Application-java-编写Hello-World"><a href="#创建Application-java-编写Hello-World" class="headerlink" title="创建Application.java 编写Hello World"></a>创建Application.java 编写Hello World</h2>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">import org.springframework.boot.SpringApplication;</div><div class="line">import org.springframework.boot.autoconfigure.SpringBootApplication;</div><div class="line">import org.springframework.web.bind.annotation.RequestMapping;</div><div class="line">import org.springframework.web.bind.annotation.RestController;</div><div class="line"></div><div class="line">@SpringBootApplication</div><div class="line">@RestController</div><div class="line">public class Application &#123;</div><div class="line"></div><div class="line">    @RequestMapping(&quot;/&quot;)</div><div class="line">    public String greeting() &#123;</div><div class="line">        return &quot;Hello World!&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        SpringApplication.run(Application.class, args);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="添加配置文件，SpringBoot的配置文件名默认为application-yml-或者-properties"><a href="#添加配置文件，SpringBoot的配置文件名默认为application-yml-或者-properties" class="headerlink" title="添加配置文件，SpringBoot的配置文件名默认为application.yml(或者 properties)"></a>添加配置文件，SpringBoot的配置文件名默认为application.yml(或者 properties)</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">\#修改默认端口</div><div class="line">server:</div><div class="line">  port: 8001</div></pre></td></tr></table></figure>
-<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">spring boot 是通过main函数启动内置的Tomcat服务的，</div><div class="line">直接通过maven命令 spring-boot:run来启动服务，除了配置文件外，</div><div class="line">其他使用和spring4MVC的注解方式一样操作</div></pre></td></tr></table></figure>
-<h2 id="集成thymleaf模板页面"><a href="#集成thymleaf模板页面" class="headerlink" title="集成thymleaf模板页面"></a>集成thymleaf模板页面</h2><p>   spring boot 推荐使用 thymeleaf模板作为前端视图</p>
-<h3 id="在pom文件中添加-依赖"><a href="#在pom文件中添加-依赖" class="headerlink" title="在pom文件中添加 依赖"></a>在pom文件中添加 依赖</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;spring-boot-starter-thymeleaf&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<h3 id="在application文件中添加配置"><a href="#在application文件中添加配置" class="headerlink" title="在application文件中添加配置"></a>在application文件中添加配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">spring:</div><div class="line">  thymeleaf:</div><div class="line">    prefix: classpath:/templates/  </div><div class="line">    suffix: .html  </div><div class="line">    mode: HTML5  </div><div class="line">    encoding: UTF-8  </div><div class="line">    content-type: text/html  </div><div class="line">    # 开发环境下关闭cache</div><div class="line">    cache： false</div></pre></td></tr></table></figure>
-<h3 id="测试代码，html页面和Controller"><a href="#测试代码，html页面和Controller" class="headerlink" title="测试代码，html页面和Controller"></a>测试代码，html页面和Controller</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">import java.util.Map;  </div><div class="line">import org.springframework.stereotype.Controller;  </div><div class="line">import org.springframework.web.bind.annotation.RequestMapping; </div><div class="line">@Controller   </div><div class="line">publicclass TemplateController &#123;  </div><div class="line">    /**  </div><div class="line">     * 返回html模板.  </div><div class="line">     */  </div><div class="line">    @RequestMapping(&quot;/helloHtml&quot;)  </div><div class="line">    public String helloHtml(Map&lt;String,Object&gt; map)&#123;  </div><div class="line">       map.put(&quot;hello&quot;,&quot;from TemplateController.helloHtml&quot;);  </div><div class="line">       return&quot;/helloHtml&quot;;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE html&gt;  </div><div class="line">&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:th=&quot;http://www.thymeleaf.org&quot;  </div><div class="line">      xmlns:sec=&quot;http://www.thymeleaf.org/thymeleaf-extras-springsecurity3&quot;&gt;  </div><div class="line">    &lt;head&gt;  </div><div class="line">        &lt;title&gt;Hello World!&lt;/title&gt;  </div><div class="line">    &lt;/head&gt;  </div><div class="line">    &lt;body&gt;  </div><div class="line">        &lt;h1 th:inline=&quot;text&quot;&gt;Hello.v.2&lt;/h1&gt;  </div><div class="line">        &lt;p th:text=&quot;$&#123;hello&#125;&quot;&gt;&lt;/p&gt;  </div><div class="line">    &lt;/body&gt;  </div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
-
-          
+          <p>Spring Boot 逐渐成为开发主流，微架构的基础，让我们一起搭建一个简单的例子吧<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/05/11/springboot/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -786,122 +893,6 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/05/11/springcloud-config/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/11/markdown/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="zhengmingzhi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/head.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="学武之境">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/05/11/markdown/" itemprop="url">Hexo部署和Markdown使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-11T17:35:13+08:00">
-                2017-05-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>  Hexo部署和Markdown标记的使用介绍<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/05/11/markdown/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
