@@ -1,0 +1,693 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring,Spring Cloud,Netfilx,Consul,Spring boot" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Redis的键空间通知(keyspace notifications)功能是自2.8.0版本开始加入的，客户端可以通过订阅/发布(Pub/Sub)机制，接收那些以某种方式改变了Redis数据空间的事件通知。  通知是通过Redis的订阅/发布机制发送的，因此，所有支持订阅/发布功能的客户端都可在无需调整的情况下，使用键空间通知功能。   Redis的发布/订阅目前是即发即弃(fire and">
+<meta property="og:type" content="article">
+<meta property="og:title" content="springboot-redis key到期事件通知（消息订阅发布）">
+<meta property="og:url" content="http://yoursite.com/2017/06/01/springboot-redis-key-space-notifications/index.html">
+<meta property="og:site_name" content="学武之境">
+<meta property="og:description" content="Redis的键空间通知(keyspace notifications)功能是自2.8.0版本开始加入的，客户端可以通过订阅/发布(Pub/Sub)机制，接收那些以某种方式改变了Redis数据空间的事件通知。  通知是通过Redis的订阅/发布机制发送的，因此，所有支持订阅/发布功能的客户端都可在无需调整的情况下，使用键空间通知功能。   Redis的发布/订阅目前是即发即弃(fire and">
+<meta property="og:updated_time" content="2017-06-01T03:13:50.168Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="springboot-redis key到期事件通知（消息订阅发布）">
+<meta name="twitter:description" content="Redis的键空间通知(keyspace notifications)功能是自2.8.0版本开始加入的，客户端可以通过订阅/发布(Pub/Sub)机制，接收那些以某种方式改变了Redis数据空间的事件通知。  通知是通过Redis的订阅/发布机制发送的，因此，所有支持订阅/发布功能的客户端都可在无需调整的情况下，使用键空间通知功能。   Redis的发布/订阅目前是即发即弃(fire and">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/01/springboot-redis-key-space-notifications/"/>
+
+
+
+
+
+  <title>springboot-redis key到期事件通知（消息订阅发布） | 学武之境</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">学武之境</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/01/springboot-redis-key-space-notifications/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhengmingzhi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="学武之境">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">springboot-redis key到期事件通知（消息订阅发布）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-01T10:15:07+08:00">
+                2017-06-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>  Redis的键空间通知(keyspace notifications)功能是自2.8.0版本开始加入的，客户端可以通过订阅/发布(Pub/Sub)机制，接收那些以某种方式改变了Redis数据空间的事件通知。<br>  通知是通过Redis的订阅/发布机制发送的，因此，所有支持订阅/发布功能的客户端都可在无需调整的情况下，使用键空间通知功能。<br>   Redis的发布/订阅目前是即发即弃(fire and forget)模式的，因此无法实现事件的可靠通知。也就是说，如果发布/订阅的客户端断链之后又重连，则在客户端断链期间的所有事件都丢失了。<br>   未来计划支持事件的可靠通知，但是这可能会通过让订阅与发布功能本身变得更可靠来实现，也可能会在Lua脚本中对消息的订阅与发布进行监听，从而实现类似将事件推入到列表这样的操作。<br>   <a id="more"></a></p>
+<h1 id="Key过期事件的Redis配置"><a href="#Key过期事件的Redis配置" class="headerlink" title="Key过期事件的Redis配置"></a>Key过期事件的Redis配置</h1><p>因键空间通知功能需要耗费一定的CPU时间，因此默认情况下，该功能是关闭的。可以通过修改配置文件redis.conf，或者通过CONFIG SET命令，设置notify-keyspace-events选项，来启用或关闭该功能。<br>该选项的值为空字符串时，该功能禁用，选项值为非空字符串时，启用该功能，非空字符串由特定的多个字符组成，每个字符表示不同的意义：<br>         K：keyspace事件，事件以<strong>keyspace@<db></db></strong>为前缀进行发布；<br>         E：keyevent事件，事件以<strong>keyevent@<db></db></strong>为前缀进行发布；<br>         g：一般性的，非特定类型的命令，比如del，expire，rename等；<br>         $：字符串特定命令；<br>         l：列表特定命令；<br>         s：集合特定命令；<br>         h：哈希特定命令；<br>         z：有序集合特定命令；<br>         x：过期事件，当某个键过期并删除时会产生该事件；<br>         e：驱逐事件，当某个键因maxmemore策略而被删除时，产生该事件；<br>         A：g$lshzxe的别名，因此”AKE”意味着所有事件。<br>        这里需要配置 notify-keyspace-events 的参数为 “Ex”。x 代表了过期事件。notify-keyspace-events “Ex” 保存配置后，重启Redis服务，使配置生效。</p>
+<h1 id="expired事件通知的发送时间"><a href="#expired事件通知的发送时间" class="headerlink" title="expired事件通知的发送时间"></a>expired事件通知的发送时间</h1><p>Redis 使用以下两种方式删除过期的键：<br>         a：当一个键被访问时，程序会对这个键进行检查，如果键已过期，则删除该键；<br>         b：系统会在后台定期扫描并删除那些过期的键；<br>         当过期键被以上两种方式中的任意一种发现并且删除时，才会产生expired事件通知。<br>         Redis不保证生存时间（TTL）变为 0 的键会立即被删除：如果没有命令访问这个键，或者设置生存时间的键非常多的话，那么在键的生存时间变为0，到该键真正被删除，这中间可能会有一段比较显著的时间间隔。<br>         因此，Redis产生expired事件通知的时间，是过期键被删除的时候，而不是键的生存时间变为 0 的时候。</p>
+<h1 id="客户端验证-Publish-Subscribe"><a href="#客户端验证-Publish-Subscribe" class="headerlink" title="客户端验证 Publish / Subscribe"></a>客户端验证 Publish / Subscribe</h1><ol>
+<li>进入redis的home目录，<code>redis-server reids.conf</code> 启动Redis，如果配置文件没有开启键值空间配置，可以通过 <code>config set notify-keyspace-events KEA</code>设置</li>
+<li>进入客户端命令 <code>redis-cli -h 127.0.0.1 -p 6379</code></li>
+<li><p>订阅过期键值消息事件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; psubscribe __keyevent@0__:expired</div><div class="line">Reading messages... (press Ctrl-C to quit)</div><div class="line">1) &quot;psubscribe&quot;</div><div class="line">2) &quot;__keyevent@0__:expired&quot;</div><div class="line">3) (integer) 1</div></pre></td></tr></table></figure>
+</li>
+<li><p>再开启一个终端，redis-cli 进入 redis，新增一个 10秒过期的键：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set testkey 123456 EX 10</div><div class="line">OK</div></pre></td></tr></table></figure>
+</li>
+<li><p>观察另一个客户端，10s后的结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; psubscribe __keyevent@0__:expired</div><div class="line">Reading messages... (press Ctrl-C to quit)</div><div class="line">1) &quot;psubscribe&quot;</div><div class="line">2) &quot;__keyevent@0__:expired&quot;</div><div class="line">3) (integer) 1</div><div class="line">1) &quot;pmessage&quot;</div><div class="line">2) &quot;__keyevent@0__:expired&quot;</div><div class="line">3) &quot;__keyevent@0__:expired&quot;</div><div class="line">4) &quot;testkey&quot;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="srping-boot-redis配置"><a href="#srping-boot-redis配置" class="headerlink" title="srping boot redis配置"></a>srping boot redis配置</h1><h2 id="jar包依赖"><a href="#jar包依赖" class="headerlink" title="jar包依赖"></a>jar包依赖</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">  &lt;dependency&gt;</div><div class="line">  		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-redis&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;1.4.6.RELEASE&lt;/version&gt;</div><div class="line">  &lt;/dependency&gt;</div><div class="line">  &lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.session&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-session&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.session&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-session-data-redis&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">spring:</div><div class="line">    session:</div><div class="line">    #使用了spring-session的缓存jar包，如果不配置store-type: none 启动报错</div><div class="line">      store-type: none </div><div class="line">    redis: </div><div class="line">      database: 0</div><div class="line">      host: 127.0.0.1</div><div class="line">      port: 6379</div><div class="line">      password: </div><div class="line">      pool.max-active: 8</div><div class="line">      pool.max-wait: -1</div><div class="line">      pool.max-idle: 8</div><div class="line">      pool.min-idle: 0</div><div class="line">      timeout: 0</div><div class="line">    task:</div><div class="line">      pool:</div><div class="line">        corePoolSize: 10</div><div class="line">        maxPoolSize: 20</div><div class="line">        keepAliveSeconds: 60</div><div class="line">        queueCapacity: 100</div><div class="line">        threadNamePrefix: myThreadPool</div><div class="line">        topic: __keyevent@0__:expired</div></pre></td></tr></table></figure>
+<h2 id="Reis配置类"><a href="#Reis配置类" class="headerlink" title="Reis配置类"></a>Reis配置类</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line">package com.ule.wholesale.fxpurchase.web.redis;</div><div class="line"></div><div class="line">import java.lang.reflect.Method;</div><div class="line"></div><div class="line"></div><div class="line">import org.springframework.cache.CacheManager;</div><div class="line">import org.springframework.cache.annotation.CachingConfigurerSupport;</div><div class="line">import org.springframework.cache.annotation.EnableCaching;</div><div class="line">import org.springframework.context.annotation.Bean;</div><div class="line">import org.springframework.context.annotation.Configuration;</div><div class="line">import org.springframework.data.redis.cache.RedisCacheManager;</div><div class="line">import org.springframework.data.redis.connection.RedisConnectionFactory;</div><div class="line">import org.springframework.data.redis.core.RedisTemplate;</div><div class="line">import org.springframework.data.redis.core.StringRedisTemplate;</div><div class="line">import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;</div><div class="line">import org.springframework.cache.interceptor.KeyGenerator;</div><div class="line">import com.fasterxml.jackson.annotation.JsonAutoDetect;</div><div class="line">import com.fasterxml.jackson.annotation.PropertyAccessor;</div><div class="line">import com.fasterxml.jackson.databind.ObjectMapper;</div><div class="line"></div><div class="line">@Configuration</div><div class="line">@EnableCaching</div><div class="line">public class RedisConfig extends CachingConfigurerSupport &#123;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">    public org.springframework.cache.interceptor.KeyGenerator keyGenerator() &#123;</div><div class="line">        return new KeyGenerator() &#123;</div><div class="line">            @Override</div><div class="line">            public Object generate(Object target, Method method, Object... params) &#123;</div><div class="line">                StringBuilder sb = new StringBuilder();</div><div class="line">                sb.append(target.getClass().getName());</div><div class="line">                sb.append(method.getName());</div><div class="line">                for (Object obj : params) &#123;</div><div class="line">                    sb.append(obj.toString());</div><div class="line">                &#125;</div><div class="line">                return sb.toString();</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">	</div><div class="line">	@SuppressWarnings(&quot;rawtypes&quot;)</div><div class="line">    @Bean</div><div class="line">    public CacheManager cacheManager(RedisTemplate redisTemplate) &#123;</div><div class="line">        RedisCacheManager rcm = new RedisCacheManager(redisTemplate);</div><div class="line">        //设置缓存过期时间</div><div class="line">        //rcm.setDefaultExpiration(60);//秒</div><div class="line">        return rcm;</div><div class="line">    &#125;</div><div class="line">	</div><div class="line">	@Bean</div><div class="line">    public RedisTemplate&lt;String, String&gt; redisTemplate(RedisConnectionFactory factory) &#123;</div><div class="line">        StringRedisTemplate template = new StringRedisTemplate(factory);</div><div class="line">        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);</div><div class="line">        ObjectMapper om = new ObjectMapper();</div><div class="line">        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);</div><div class="line">        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);</div><div class="line">        jackson2JsonRedisSerializer.setObjectMapper(om);</div><div class="line">        template.setValueSerializer(jackson2JsonRedisSerializer);</div><div class="line">        template.afterPropertiesSet();</div><div class="line">        return template;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Redis设置key-value和get值"><a href="#Redis设置key-value和get值" class="headerlink" title="Redis设置key/value和get值"></a>Redis设置key/value和get值</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">package com.ule.wholesale.fxpurchase.web.redis;</div><div class="line"></div><div class="line">import java.util.concurrent.TimeUnit;</div><div class="line"></div><div class="line">import javax.annotation.Resource;</div><div class="line"></div><div class="line">import org.springframework.data.redis.core.RedisTemplate;</div><div class="line">import org.springframework.data.redis.core.ValueOperations;</div><div class="line">import org.springframework.stereotype.Service;</div><div class="line">@Service</div><div class="line">public class RedisService &#123;</div><div class="line">	@Resource</div><div class="line">	private RedisTemplate&lt;String, Object&gt; redisTemplate;</div><div class="line">	public void set(String key, Object value) &#123;</div><div class="line">		ValueOperations&lt;String, Object&gt; vo = redisTemplate.opsForValue();</div><div class="line">		vo.set(key, value);</div><div class="line">	&#125;</div><div class="line">	/**</div><div class="line">	 * 设置过期的key/value，过期时间单位为分钟</div><div class="line">	 * @param key</div><div class="line">	 * @param value</div><div class="line">	 * @param mins</div><div class="line">	 */</div><div class="line">	public void set(String key, Object value,Integer mins) &#123;</div><div class="line">		ValueOperations&lt;String, Object&gt; vo = redisTemplate.opsForValue();</div><div class="line">		vo.set(key, value, mins, TimeUnit.MINUTES);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public Object get(String key) &#123;</div><div class="line">		ValueOperations&lt;String, Object&gt; vo = redisTemplate.opsForValue();</div><div class="line">		return vo.get(key);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="Spring-boot中实现过期事件监听"><a href="#Spring-boot中实现过期事件监听" class="headerlink" title="Spring boot中实现过期事件监听"></a>Spring boot中实现过期事件监听</h1><h2 id="配置属性类-TaskThreadPoolConfig"><a href="#配置属性类-TaskThreadPoolConfig" class="headerlink" title="配置属性类 TaskThreadPoolConfig"></a>配置属性类 TaskThreadPoolConfig</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">package com.ule.wholesale.fxpurchase.web.redis;</div><div class="line"></div><div class="line">import org.springframework.boot.context.properties.ConfigurationProperties;</div><div class="line">import org.springframework.stereotype.Component;</div><div class="line"></div><div class="line">@Component</div><div class="line">@ConfigurationProperties(prefix=&quot;spring.task.pool&quot;)</div><div class="line">public class TaskThreadPoolConfig &#123;</div><div class="line"></div><div class="line">	private Integer corePoolSize;</div><div class="line">	private Integer maxPoolSize;</div><div class="line">	private Integer queueCapacity;</div><div class="line">	private Integer keepAliveSeconds;</div><div class="line">	private String threadNamePrefix;</div><div class="line">	private String topic;</div><div class="line">	</div><div class="line">  set get ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="监听配置类"><a href="#监听配置类" class="headerlink" title="监听配置类"></a>监听配置类</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line">package com.ule.wholesale.fxpurchase.web.redis;</div><div class="line"></div><div class="line">import java.util.concurrent.Executor;</div><div class="line">import java.util.concurrent.ThreadPoolExecutor;</div><div class="line"></div><div class="line">import javax.annotation.Resource;</div><div class="line"></div><div class="line">import org.springframework.beans.factory.annotation.Autowired;</div><div class="line">import org.springframework.beans.factory.annotation.Value;</div><div class="line">import org.springframework.context.annotation.Bean;</div><div class="line">import org.springframework.context.annotation.Configuration;</div><div class="line">import org.springframework.data.redis.core.RedisTemplate;</div><div class="line">import org.springframework.data.redis.listener.ChannelTopic;</div><div class="line">import org.springframework.data.redis.listener.RedisMessageListenerContainer;</div><div class="line">import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;</div><div class="line"></div><div class="line">@Configuration</div><div class="line">public class RedisMessageListenerContainerConfig &#123;</div><div class="line">	@Resource</div><div class="line">	private RedisTemplate&lt;String, Object&gt; redisTemplate;</div><div class="line">	</div><div class="line">	@Autowired</div><div class="line">	private TopicMessageListener messageListener;</div><div class="line">	</div><div class="line">	@Autowired</div><div class="line">	private TaskThreadPoolConfig config;</div><div class="line">	</div><div class="line">	@Value(&quot;spring.redis.topic&quot;)</div><div class="line">	private String topic;</div><div class="line">	</div><div class="line">	@Bean</div><div class="line">	public RedisMessageListenerContainer configRedisMessageListenerContainer(Executor executor)&#123;</div><div class="line">		RedisMessageListenerContainer container = new RedisMessageListenerContainer();</div><div class="line">		// 设置Redis的连接工厂</div><div class="line">		container.setConnectionFactory(redisTemplate.getConnectionFactory());</div><div class="line">		// 设置监听使用的线程池</div><div class="line">		container.setTaskExecutor(executor);</div><div class="line">		// 设置监听的Topic</div><div class="line">		ChannelTopic channelTopic = new ChannelTopic(config.getTopic());//&quot;__keyevent@0__:expired&quot;);</div><div class="line">		// 设置监听器</div><div class="line">		container.addMessageListener(messageListener, channelTopic);</div><div class="line">		return container;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	@Bean // 配置线程池</div><div class="line">	public Executor myTaskAsyncPool() &#123;</div><div class="line">		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();</div><div class="line">		executor.setCorePoolSize(config.getCorePoolSize());</div><div class="line">		executor.setMaxPoolSize(config.getMaxPoolSize());</div><div class="line">		executor.setQueueCapacity(config.getQueueCapacity());</div><div class="line">		executor.setKeepAliveSeconds(config.getKeepAliveSeconds());</div><div class="line">		executor.setThreadNamePrefix(config.getThreadNamePrefix());</div><div class="line"></div><div class="line">		// rejection-policy：当pool已经达到max size的时候，如何处理新任务</div><div class="line">		// CALLER_RUNS：不在新线程中执行任务，而是由调用者所在的线程来执行</div><div class="line">		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());</div><div class="line">		executor.initialize();</div><div class="line">		return executor;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="监听执行类"><a href="#监听执行类" class="headerlink" title="监听执行类"></a>监听执行类</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">package com.ule.wholesale.fxpurchase.web.redis;</div><div class="line"></div><div class="line">import org.springframework.data.redis.connection.Message;</div><div class="line">import org.springframework.data.redis.connection.MessageListener;</div><div class="line">import org.springframework.stereotype.Component;</div><div class="line"></div><div class="line">@Component</div><div class="line">public class TopicMessageListener  implements MessageListener &#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void onMessage(Message message, byte[] pattern) &#123;// 客户端监听订阅的topic，当有消息的时候，会触发该方法</div><div class="line">        	byte[] body = message.getBody();// 请使用valueSerializer</div><div class="line">        	byte[] channel = message.getChannel();</div><div class="line">        	String topic = new String(channel);</div><div class="line">        	String itemValue = new String(body);</div><div class="line">        	// 请参考配置文件，本例中key，value的序列化方式均为string。</div><div class="line">        	System.out.println(&quot;topic:&quot;+topic);</div><div class="line">        	System.out.println(&quot;itemValue:&quot;+itemValue);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/25/springcloud-consul-feign-demo/" rel="next" title="通过consul实现服务发现，feignclient实现REST接口封装，从server到服务发现，客户端封装和web应用调用的一个demo">
+                <i class="fa fa-chevron-left"></i> 通过consul实现服务发现，feignclient实现REST接口封装，从server到服务发现，客户端封装和web应用调用的一个demo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/head.png"
+               alt="zhengmingzhi" />
+          <p class="site-author-name" itemprop="name">zhengmingzhi</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Key过期事件的Redis配置"><span class="nav-number">1.</span> <span class="nav-text">Key过期事件的Redis配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#expired事件通知的发送时间"><span class="nav-number">2.</span> <span class="nav-text">expired事件通知的发送时间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#客户端验证-Publish-Subscribe"><span class="nav-number">3.</span> <span class="nav-text">客户端验证 Publish / Subscribe</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#srping-boot-redis配置"><span class="nav-number">4.</span> <span class="nav-text">srping boot redis配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#jar包依赖"><span class="nav-number">4.1.</span> <span class="nav-text">jar包依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件"><span class="nav-number">4.2.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reis配置类"><span class="nav-number">4.3.</span> <span class="nav-text">Reis配置类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis设置key-value和get值"><span class="nav-number">4.4.</span> <span class="nav-text">Redis设置key/value和get值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring-boot中实现过期事件监听"><span class="nav-number">5.</span> <span class="nav-text">Spring boot中实现过期事件监听</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置属性类-TaskThreadPoolConfig"><span class="nav-number">5.1.</span> <span class="nav-text">配置属性类 TaskThreadPoolConfig</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监听配置类"><span class="nav-number">5.2.</span> <span class="nav-text">监听配置类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监听执行类"><span class="nav-number">5.3.</span> <span class="nav-text">监听执行类</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhengmingzhi</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
