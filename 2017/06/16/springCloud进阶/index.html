@@ -1,0 +1,761 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring,Spring Cloud,Netfilx,Consul,Spring boot" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="前面介绍过，spring cloud项目是基于spring boot的，本篇文章是对spring boot和cloud常用配置进行简单提取、封装和约定，主要包括数据源配置、mybatis配置、常量、公共帮助类、consul的配置、公共过滤器等功能配置。公共配置将以jar包形式提供。如果有更好的封装和配置，将在后续文章中进行介绍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="springCloud进阶">
+<meta property="og:url" content="http://yoursite.com/2017/06/16/springCloud进阶/index.html">
+<meta property="og:site_name" content="学武之境">
+<meta property="og:description" content="前面介绍过，spring cloud项目是基于spring boot的，本篇文章是对spring boot和cloud常用配置进行简单提取、封装和约定，主要包括数据源配置、mybatis配置、常量、公共帮助类、consul的配置、公共过滤器等功能配置。公共配置将以jar包形式提供。如果有更好的封装和配置，将在后续文章中进行介绍。">
+<meta property="og:updated_time" content="2017-06-16T06:04:34.629Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="springCloud进阶">
+<meta name="twitter:description" content="前面介绍过，spring cloud项目是基于spring boot的，本篇文章是对spring boot和cloud常用配置进行简单提取、封装和约定，主要包括数据源配置、mybatis配置、常量、公共帮助类、consul的配置、公共过滤器等功能配置。公共配置将以jar包形式提供。如果有更好的封装和配置，将在后续文章中进行介绍。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/16/springCloud进阶/"/>
+
+
+
+
+
+  <title>springCloud进阶 | 学武之境</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">学武之境</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/16/springCloud进阶/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhengmingzhi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="学武之境">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">springCloud进阶</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-16T12:10:13+08:00">
+                2017-06-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p> 前面介绍过，spring cloud项目是基于spring boot的，本篇文章是对spring boot和cloud常用配置进行简单提取、封装和约定，主要包括数据源配置、mybatis配置、常量、公共帮助类、consul的配置、公共过滤器等功能配置。公共配置将以jar包形式提供。如果有更好的封装和配置，将在后续文章中进行介绍。<br><a id="more"></a></p>
+<h1 id="公共模块"><a href="#公共模块" class="headerlink" title="公共模块"></a>公共模块</h1><h2 id="在当前版本中，公共模块主要包括公共常量、业务中的枚举、数据源配置、SQLFilter、XssShellFilter（防止js、css注入）、常用util、Application父类"><a href="#在当前版本中，公共模块主要包括公共常量、业务中的枚举、数据源配置、SQLFilter、XssShellFilter（防止js、css注入）、常用util、Application父类" class="headerlink" title="在当前版本中，公共模块主要包括公共常量、业务中的枚举、数据源配置、SQLFilter、XssShellFilter（防止js、css注入）、常用util、Application父类"></a>在当前版本中，公共模块主要包括公共常量、业务中的枚举、数据源配置、SQLFilter、XssShellFilter（防止js、css注入）、常用util、Application父类</h2><blockquote>
+<ol>
+<li><p>公共常量在platfrom-properties.yml文件中进行配置在CommonConstants类中进行初始化，当前已有配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public static String uploadTempDir;</div><div class="line">public static String uploadFileToDFSUrl;</div><div class="line">public static String uploadFileUrl;</div><div class="line">public static String globalStaticServer1;</div><div class="line">public static String globalStaticServer2;</div><div class="line">public static String globalStaticServer3;</div><div class="line">public static String searchDistrIpPort;</div></pre></td></tr></table></figure>
+</li>
+<li><p>常量类的属性是通过 <code>@Value(&quot;${uploadTempDir}&quot;)</code>进行设置的，在springboot中@Value不支持静态变量的赋值，所以我们通过在set方法上添加<code>@Value(&quot;${uploadTempDir}&quot;)</code>可以实现</p>
+</li>
+</ol>
+</blockquote>
+<h2 id="业务中的枚举对象，对应已经定义好的枚举值，并且需要多处使用的可以申请放到公共模块中"><a href="#业务中的枚举对象，对应已经定义好的枚举值，并且需要多处使用的可以申请放到公共模块中" class="headerlink" title="业务中的枚举对象，对应已经定义好的枚举值，并且需要多处使用的可以申请放到公共模块中"></a>业务中的枚举对象，对应已经定义好的枚举值，并且需要多处使用的可以申请放到公共模块中</h2><h2 id="数据源配置，目前定义了单数据源的配置，包括mysql和oracle-下面通过mysql进行说明"><a href="#数据源配置，目前定义了单数据源的配置，包括mysql和oracle-下面通过mysql进行说明" class="headerlink" title="数据源配置，目前定义了单数据源的配置，包括mysql和oracle ,下面通过mysql进行说明"></a>数据源配置，目前定义了单数据源的配置，包括mysql和oracle ,下面通过mysql进行说明</h2><blockquote>
+<ol>
+<li>需要使用什么类型的数据源就在自己项目中的<code>MybatisConfiguration</code>配置类上通过<code>@Import({ DataBaseMysqlConfiguration.class })</code>导入需要的数据源</li>
+<li><p>数据源配置文件DataBaseMysqlConfiguration需要在自己项目中添加一个文件名为jdbc2.properties的配置文件内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">jdbc.ule_uwds_selfsupport-master.url=jdbc:mysql://ip:3306/dbname?autoReconnect=true&amp;autoReconnectForPools=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;zeroDateTimeBehavior=convertToNull</div><div class="line">jdbc.ule_uwds_selfsupport-master.username=username</div><div class="line">jdbc.ule_uwds_selfsupport-master.password=***</div><div class="line">jdbc.ule_uwds_selfsupport-master.initialSize=5</div><div class="line">jdbc.ule_uwds_selfsupport-master.maxActive=5</div><div class="line">jdbc.ule_uwds_selfsupport-master.maxIdle=5</div><div class="line">jdbc.ule_uwds_selfsupport-master.minIdle=1</div><div class="line">jdbc.ule_uwds_selfsupport-master.maxWait=6000</div><div class="line">jdbc.ule_uwds_selfsupport-master.validationQuery=SELECT 1</div></pre></td></tr></table></figure>
+</li>
+<li><p>以上配置会通过<code>JDBC2MysqlConfiguration</code>类读人配置的属性值并应用到数据源配置中,在<code>DataBaseMysqlConfiguration</code>类上面通过<code>@Import({JDBC2MysqlConfiguration.class})</code>来创建一个Bean，然后再使用，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@PropertySource(&quot;classpath:jdbc2.properties&quot;)</div><div class="line">@ConfigurationProperties(prefix=&quot;jdbc.ule_uwds_selfsupport-master&quot;)</div><div class="line">public class JDBC2MysqlConfiguration &#123;</div><div class="line">	</div><div class="line">	private String username;</div><div class="line">	private String password;</div><div class="line">	private String url;</div><div class="line">	private Integer initialSize;</div><div class="line">	private Integer maxActive;</div><div class="line">	private Integer maxIdle;</div><div class="line">	private Integer minIdle;</div><div class="line">	private Integer maxWait;</div><div class="line">	private String validationQuery;</div></pre></td></tr></table></figure>
+</li>
+<li><p>JDBC2MysqlConfiguration的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">@Import(&#123;JDBC2MysqlConfiguration.class&#125;)</div><div class="line">public class DataBaseMysqlConfiguration implements EnvironmentAware &#123;</div><div class="line"></div><div class="line">	private static Log log = LogFactory.getLog(DataBaseMysqlConfiguration.class);</div><div class="line">	private RelaxedPropertyResolver propertyResolver;  </div><div class="line">    @Autowired</div><div class="line">    JDBC2MysqlConfiguration jdbc;</div><div class="line">	@Override</div><div class="line">	public void setEnvironment(Environment env) &#123;</div><div class="line">		this.propertyResolver = new RelaxedPropertyResolver(env, &quot;spring.datasource.&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean(name=&quot;dataSource&quot;, destroyMethod = &quot;close&quot;, initMethod=&quot;init&quot;)  </div><div class="line">    @Primary  </div><div class="line">    public DataSource dataSource() &#123;  </div><div class="line">        log.debug(&quot;Configruing Write druid DataSource&quot;);  </div><div class="line">          </div><div class="line">        DruidDataSource dataSource = new DruidDataSource();  </div><div class="line">        log.info(&quot;jdbc.getUsername()=&quot;+jdbc.getUsername());</div><div class="line">        log.info(&quot;jdbc.getUrl()=&quot;+jdbc.getUrl());</div><div class="line">        log.info(&quot;jdbc.getPassword()=&quot;+jdbc.getPassword());</div><div class="line">        log.info(&quot;driver-class-name=&quot;+propertyResolver.getProperty(&quot;driver-class-name&quot;));</div><div class="line">        dataSource.setUrl(jdbc.getUrl()); </div><div class="line">        dataSource.setUsername(jdbc.getUsername());//用户名  </div><div class="line">        dataSource.setPassword(jdbc.getPassword());//密码  </div><div class="line">        dataSource.setDriverClassName(propertyResolver.getProperty(&quot;driver-class-name&quot;));  </div><div class="line">        dataSource.setInitialSize(jdbc.getInitialSize());  </div><div class="line">        dataSource.setMaxActive(jdbc.getMaxActive());  </div><div class="line">        dataSource.setMinIdle(jdbc.getMinIdle());  </div><div class="line">        dataSource.setMaxWait(jdbc.getMaxWait());  </div><div class="line">        dataSource.setTimeBetweenEvictionRunsMillis(Integer.parseInt(propertyResolver.getProperty(&quot;timeBetweenEvictionRunsMillis&quot;)));  </div><div class="line">        dataSource.setMinEvictableIdleTimeMillis(Integer.parseInt(propertyResolver.getProperty(&quot;minEvictableIdleTimeMillis&quot;)));  </div><div class="line">        dataSource.setValidationQuery(jdbc.getValidationQuery());  </div><div class="line">        dataSource.setTestOnBorrow(Boolean.getBoolean(propertyResolver.getProperty(&quot;testOnBorrow&quot;)));  </div><div class="line">        dataSource.setTestWhileIdle(Boolean.getBoolean(propertyResolver.getProperty(&quot;testWhileIdle&quot;)));  </div><div class="line">        dataSource.setTestOnReturn(Boolean.getBoolean(propertyResolver.getProperty(&quot;testOnReturn&quot;)));  </div><div class="line">        dataSource.setPoolPreparedStatements(Boolean.getBoolean(propertyResolver.getProperty(&quot;poolPreparedStatements&quot;)));  </div><div class="line">        dataSource.setMaxPoolPreparedStatementPerConnectionSize(Integer.parseInt(propertyResolver.getProperty(&quot;maxOpenPreparedStatements&quot;)));  </div><div class="line">        //配置监控统计拦截的filters，去掉后监控界面sql无法统计，&apos;wall&apos;用于防火墙  </div><div class="line">        try &#123;</div><div class="line">			dataSource.setFilters(propertyResolver.getProperty(&quot;filters&quot;));</div><div class="line">		&#125; catch (SQLException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125; </div><div class="line">          </div><div class="line">        return dataSource;  </div><div class="line">    &#125; </div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h2 id="SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入"><a href="#SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入" class="headerlink" title="SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入"></a>SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入</h2><blockquote>
+<ol>
+<li><p>SqlFilter 验证如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">String badStr = &quot;&apos;|and|exec|execute|insert|drop|table |from|grant|group_concat|column_name|frame|iframe|script|&quot; +</div><div class="line">                    &quot;information_schema.columns|table_schema|union|where|select|delete|update|&quot; +</div><div class="line">                    &quot;chr|mid|master|truncate|declare|like|#|&lt;|&gt;&quot;;</div></pre></td></tr></table></figure>
+</li>
+<li><p>XssShellFilter验证如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private static List&lt;Object[]&gt; getXssPatternList() &#123;</div><div class="line">        List&lt;Object[]&gt; ret = new ArrayList&lt;Object[]&gt;();</div><div class="line">        ret.add(new Object[]&#123;&quot;&lt;(no)?script[^&gt;]*&gt;.*?&lt;/(no)?script&gt;&quot;, Pattern.CASE_INSENSITIVE&#125;);</div><div class="line">        ret.add(new Object[]&#123;&quot;eval\\((.*?)\\)&quot;, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL&#125;);</div><div class="line">        ret.add(new Object[]&#123;&quot;expression\\((.*?)\\)&quot;, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL&#125;);</div><div class="line">        ret.add(new Object[]&#123;&quot;(javascript:|vbscript:|view-source:)+&quot;, Pattern.CASE_INSENSITIVE&#125;);</div><div class="line">        ret.add(new Object[]&#123;&quot;&lt;(\&quot;[^\&quot;]*\&quot;|\&apos;[^\&apos;]*\&apos;|[^\&apos;\&quot;&gt;])*&gt;&quot;, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL&#125;);</div><div class="line">        ret.add(new Object[]&#123;&quot;(window\\.location|document\\.cookie|document\\.|alert\\(.*?\\)|window\\.open\\()+&quot;, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL&#125;);</div><div class="line">        ret.add(new Object[]&#123;&quot;&lt;+\\s*(oncontrolselect|oncopy|oncut|ondataavailable|ondatasetchanged|ondatasetcomplete|ondblclick|ondeactivate|ondrag|ondragend|ondragenter|ondragleave|ondragover|ondragstart|ondrop|onerror=|onerroupdate|onfilterchange|onfinish|onfocus|onfocusin|onfocusout|onhelp|onkeydown|onkeypress|onkeyup|onlayoutcomplete|onload|onlosecapture|onmousedown|onmouseenter|onmouseleave|onmousemove|onmousout|onmouseover|onmouseup|onmousewheel|onmove|onmoveend|onmovestart|onabort|onactivate|onafterprint|onafterupdate|onbefore|onbeforeactivate|onbeforecopy|onbeforecut|onbeforedeactivate|onbeforeeditocus|onbeforepaste|onbeforeprint|onbeforeunload|onbeforeupdate|onblur|onbounce|oncellchange|onchange|onclick|oncontextmenu|onpaste|onpropertychange|onreadystatechange|onreset|onresize|onresizend|onresizestart|onrowenter|onrowexit|onrowsdelete|onrowsinserted|onscroll|onselect|onselectionchange|onselectstart|onstart|onstop|onsubmit|onunload)+\\s*=+&quot;, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL&#125;);</div><div class="line">        return ret;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h2 id="Consul配置"><a href="#Consul配置" class="headerlink" title="Consul配置"></a>Consul配置</h2><blockquote>
+<ol>
+<li><p>Consul的配置在公共模块的bootstrap.yaml文件中进行了配置，其他项目中不要添加bootstrap.yaml的文件，如果需要使用bootstrap的配置文件，请使用bootstrap.yml或者bootstrap.properties，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div></pre></td><td class="code"><pre><div class="line">server:</div><div class="line">   error:</div><div class="line">     path: /500.html</div><div class="line">   session-timeout: 30</div><div class="line">   session:</div><div class="line">     cookie.http-only: true</div><div class="line">           #cookie.domain= </div><div class="line">           #cookie.max-age: -1</div><div class="line">           #cookie.path:  </div><div class="line">           </div><div class="line"># DATASOURCE</div><div class="line">spring:</div><div class="line">    session:</div><div class="line">      store-type: none </div><div class="line">    jackson:</div><div class="line">      date-format: yyyy-MM-dd HH:mm:ss</div><div class="line">      time-zone: GMT+8</div><div class="line">    datasource:</div><div class="line">        name: postmall</div><div class="line">        #driver-class-name: oracle.jdbc.driver.OracleDriver</div><div class="line">        #driver-class-name: com.mysql.jdbc.Driver</div><div class="line">        driver-class-name: com.mysql.jdbc.Driver</div><div class="line">        type: com.alibaba.druid.pool.DruidDataSource</div><div class="line">        filters: stat</div><div class="line">        timeBetweenEvictionRunsMillis: 60000</div><div class="line">        minEvictableIdleTimeMillis: 300000</div><div class="line">        testWhileIdle: true</div><div class="line">        testOnBorrow: false</div><div class="line">        testOnReturn: false</div><div class="line">        poolPreparedStatements: true</div><div class="line">        maxOpenPreparedStatements: 20</div><div class="line">    zipkin:</div><div class="line">      base-url: $&#123;zipkin-base-url&#125;</div><div class="line">    cloud:</div><div class="line">      consul:</div><div class="line">      #instanceId默认诶服务名+端口（集群时id会重复）， 已经在Java中做了配置，值为spring.application.name-ip-port格式</div><div class="line">      #healthCheckUrl和healthCheckPath都配置情况下以healthCheckUrl为准，项目中如果healthCheckUrl为空则使用本机IP和服务端口进行心跳监听</div><div class="line">        host: $&#123;consul-host&#125;:$&#123;consul-port&#125;</div><div class="line">        #port: 8500</div><div class="line">        enabled: true</div><div class="line">        discovery:</div><div class="line">          enabled: true</div><div class="line">          #instanceId: $&#123;spring.application.name&#125;:$&#123;spring.application.instance_id:$&#123;random.value&#125;&#125;</div><div class="line">          serviceName: $&#123;spring.application.name&#125;</div><div class="line">          preferIpAddress: true</div><div class="line">          port: $&#123;server.port&#125;</div><div class="line">          healthCheckPath: $&#123;server.context-path&#125;/health</div><div class="line">          healthCheckUrl: http://$&#123;server-provider-host&#125;$&#123;server.context-path&#125;/health</div><div class="line">          #healthCheckInterval: 10s      </div><div class="line">     # HTTP ENCODING  </div><div class="line">    http:  </div><div class="line">        encoding.charset: UTF-8  </div><div class="line">        encoding.enable: true  </div><div class="line">        encoding.force: true  </div><div class="line">    #spring mvc  </div><div class="line">    mvc:</div><div class="line">        view.prefix: /WEB-INF/view/</div><div class="line">        view.suffix: .jsp</div><div class="line">        static-path-pattern: /**  </div><div class="line">#该配置是让Hystrix的超时时间改为5秒，可以解决hystrix第一次访问失败的问题，因为默认我1s，第一次初始化需要时间比较长</div><div class="line">hystrix:</div><div class="line">  command:</div><div class="line">    default: </div><div class="line">      execution: </div><div class="line">        isolation:</div><div class="line">          thread.timeoutInMilliseconds: 5000</div><div class="line">          strategy: SEMAPHORE</div><div class="line">#禁用feign的hystrix</div><div class="line">#feign.hystrix.enabled=false</div><div class="line">feign:</div><div class="line">   hystrix:</div><div class="line">     enabled: true</div><div class="line">   httpclient:</div><div class="line">     enabled: true</div><div class="line">   compression: </div><div class="line">   #请求和响应GZIP压缩支持</div><div class="line">     request.enabled: true</div><div class="line">     response.enabled: true</div><div class="line">  #支持压缩的mime types</div><div class="line">     request.mime-types: text/xml,application/xml,application/json</div><div class="line">     request.min-request-size: 2048</div><div class="line">endpoints:</div><div class="line">  shutdown:</div><div class="line">    enabled: true</div><div class="line">    sensitive: true</div><div class="line">  restart:</div><div class="line">    enabled: true</div><div class="line">  health:</div><div class="line">    sensitive: false</div></pre></td></tr></table></figure>
+</li>
+<li><p>${zipkin-base-url}、${consul-host}:${consul-port} 、${server-provider-host}均在项目中自定义配置文件中进行配置即可，系统会自动获取</p>
+</li>
+<li>beta和prd均是通过域名访问应用，${server-provider-host}为对应的域名，healthCheckUrl和healthCheckPath都配置情况下以healthCheckUrl为准，配置中会从healthCheckUrl中解析对应的主机域名和端口，如果端口为空则设置为80（只有域名时才会为空），项目中如果healthCheckUrl为空或者配置格式不正确则使用本机IP和服务端口进行心跳监听。这样配置为了解决beta和生产环境下，不能通过ip+端口访问的问题</li>
+<li>如果需要使用hystrix的看板功能feign.hystrix.enabled设置为TRUE</li>
+<li>instanceId默认诶服务名+端口（集群时id会重复）， 在Java中做了配置，值为spring.application.name-ip-port格式,不建议使用随机数配置，如果使用了随机数，服务每重启一次，服务下就会多出一条记录，如果集群时服务太多，看起来比较费劲<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">public class ConsulConfig &#123;</div><div class="line">	private static Logger logger = LoggerFactory.getLogger(ConsulConfig.class);</div><div class="line">	@Autowired</div><div class="line">	ConsulDiscoveryProperties properties;</div><div class="line">	public void initConsulConfig() throws Exception &#123;</div><div class="line">		String hostIp = properties.getIpAddress();</div><div class="line">		String serverProviderHost = null;</div><div class="line">		Integer serverProviderPort = null;</div><div class="line">		if(StringUtils.isNotBlank(properties.getHealthCheckUrl()))&#123;</div><div class="line">			Pattern pattern = Pattern.compile(&quot;([a-zA-Z0-9]&#123;0,32&#125;[.])+[a-zA-Z0-9]&#123;0,32&#125;([:][1-9][0-9]&#123;1,6&#125;)?&quot;,Pattern.CASE_INSENSITIVE);</div><div class="line">			Matcher matcher = pattern.matcher(properties.getHealthCheckUrl());</div><div class="line">			if(matcher.find())&#123;</div><div class="line">				String tmpHost = matcher.group(0);</div><div class="line">				String []tmp = tmpHost.split(&quot;:&quot;);</div><div class="line">				if(tmp.length == 2)&#123;</div><div class="line">					serverProviderHost = tmp[0];</div><div class="line">					serverProviderPort = Integer.valueOf(tmp[1]);</div><div class="line">				&#125;else&#123;</div><div class="line">					serverProviderHost = tmp[0];</div><div class="line">					serverProviderPort = 80;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		logger.info(&quot;修改consul中instanceId的值，使用服务名+IP+端口,确保同一个服务在注册中心只有一条记录;hostIp=&quot;+hostIp);</div><div class="line">		//如果是本地测试使用本地IP和HealthCheckPath，非本地环境使用域名和80端口，通过tag=dev来判断</div><div class="line">		if(serverProviderHost == null)&#123;</div><div class="line">			properties.setHealthCheckUrl(null);</div><div class="line">		&#125;else&#123;</div><div class="line">			properties.setIpAddress(serverProviderHost);</div><div class="line">			properties.setHealthCheckPath(null);</div><div class="line">			properties.setPort(serverProviderPort);</div><div class="line">		&#125;</div><div class="line">		logger.info(&quot;start service serverPort=&quot;+properties.getPort());</div><div class="line">		// InstanceId默认为applicationName+端口，使用applicationName+ip + 端口，防止集群时默认名字重复</div><div class="line">		if(StringUtils.isBlank(properties.getInstanceId()))</div><div class="line">			properties.setInstanceId(properties.getServiceName()+&quot;-&quot;+hostIp+&quot;-&quot;+properties.getPort());</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h2 id="公共帮助类"><a href="#公共帮助类" class="headerlink" title="公共帮助类"></a>公共帮助类</h2><blockquote>
+<ol>
+<li>通过jackson的配置<code>spring.jacksondate-format: yyyy-MM-dd HH:mm:ss</code>，日期转成json的输入输出都是<code>yyyy-MM-dd HH:mm:ss</code>格式，所以在通过BeanUtils进行bean的复制时，时间需要进行处理,common中提供了自己的BeanUtil工具类进行了处理，如果用到了对象复制功能请使用改类</li>
+<li>DataUtil,HttpClientUtil,MD5Tools目前每个项目都有这个类，以后请用公共的工具类，如果不能满足请提出了，如确实需要，添加相应功能</li>
+<li>ResultDTO，定义为所有rest接口统一返回改对象，如果无需数据的返回直接定义 success方法，如需数据调用 success(T data)方法，如果失败请调用 fail()方法；还可以直接自己创建对象进行调用，该类中添加了remark属性留作备用<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">public final class ResultDTO&lt;T&gt; implements Serializable&#123;</div><div class="line">	</div><div class="line">	private String code;</div><div class="line">	private String msg;</div><div class="line">	private String remark;</div><div class="line">	private T data;</div><div class="line">	</div><div class="line">	</div><div class="line">	</div><div class="line">	public static ResultDTO&lt;Object&gt; success()&#123;</div><div class="line">		ResultDTO&lt;Object&gt; rst = new ResultDTO&lt;Object&gt;();</div><div class="line">		rst.setCode(&quot;0000&quot;);</div><div class="line">		return rst;</div><div class="line">	&#125;</div><div class="line">	public static &lt;T&gt; ResultDTO&lt;T&gt; success(T data)&#123;</div><div class="line">		ResultDTO&lt;T&gt; rst = new ResultDTO&lt;T&gt;();</div><div class="line">		rst.setCode(&quot;0000&quot;);</div><div class="line">		rst.setData(data);</div><div class="line">		return rst;</div><div class="line">	&#125;</div><div class="line">	public static ResultDTO&lt;Object&gt; fail(String msg)&#123;</div><div class="line">		ResultDTO&lt;Object&gt; rst = new ResultDTO&lt;Object&gt;();</div><div class="line">		rst.setCode(&quot;0001&quot;);</div><div class="line">		rst.setMsg(msg);</div><div class="line">		return rst;</div><div class="line">	&#125;</div><div class="line">    ...</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h2 id="日志文件配置"><a href="#日志文件配置" class="headerlink" title="日志文件配置"></a>日志文件配置</h2><p>日志文件已经在common中有配置，输入路径为/data/logs/tomcat/wholesale/${项目的上下文名称}/项目的上下文名称.log,项目的上下文名称日志文件会自动从配置文件中获取server.context-path的值，如果不需要设置context-path的请复制配置文件自行设置</p>
+<h2 id="其他说明"><a href="#其他说明" class="headerlink" title="其他说明"></a>其他说明</h2><p>公共模块中的bootstrap.yaml文件中的所有配置都可以在自己项目中进行覆盖，要求必须在application.yml或者properties的配置文件中进行相同属性名的配置，因为spring boot在启动时会先加载bootstrap开头的配置文件，其次才加载application开头的配置文件，后者会覆盖前者相同属性名的配置，另外建议在自己项目中添加bootstrap.yml的配置文件在文件中配置spring.application.name,这样其他组件中如需获取就会读取到真正的name，否则其他加载优先级比较高的组件获取的名字就是默认的bootstrap</p>
+<h1 id="Rest服务实现模块"><a href="#Rest服务实现模块" class="headerlink" title="Rest服务实现模块"></a>Rest服务实现模块</h1><h2 id="Consul初始化"><a href="#Consul初始化" class="headerlink" title="Consul初始化"></a>Consul初始化</h2><blockquote>
+<ol>
+<li><p>在公共模块定义了consul的配置，但是没有加载，所有在这里进行加载使用,一定要实现InitializingBean，这样的bean加载的优先级高，配置才会生效</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">@Import(ConsulConfig.class)</div><div class="line">public class ConsulInitializingBean implements InitializingBean &#123;</div><div class="line"></div><div class="line">	private static Logger logger = LoggerFactory.getLogger(ConsulInitializingBean.class);</div><div class="line">//	@Autowired</div><div class="line">//	ConsulDiscoveryProperties properties;</div><div class="line">	@Autowired</div><div class="line">	ConsulConfig consulConfig;</div><div class="line">	@Override</div><div class="line">	public void afterPropertiesSet() throws Exception &#123;</div><div class="line">		logger.info(&quot;initConsulConfig &quot;);</div><div class="line">		// 一定要在 InitializingBean bean中调用，如果初始化时机比较晚，配置就不起作用了</div><div class="line">		consulConfig.initConsulConfig();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>如果需要启动时初始化数据可以在InitLinstener类中添加相应代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">public class InitLinstener implements ApplicationListener&lt;ContextRefreshedEvent&gt;&#123;</div><div class="line">	private static Log logger = LogFactory.getLog(InitLinstener.class);  </div><div class="line">	private static KafkaClientsConfig config = KafkaClientsConfig.DEFAULT_INSTANCE;</div><div class="line">	@Override</div><div class="line">	public void onApplicationEvent(ContextRefreshedEvent arg0) &#123;</div><div class="line">		startRecevier();</div><div class="line">		logger.info(&quot;consumer init end&quot;);</div><div class="line">	&#125;</div><div class="line">    ...</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h2 id="Mybatis配置"><a href="#Mybatis配置" class="headerlink" title="Mybatis配置"></a>Mybatis配置</h2><blockquote>
+<ol>
+<li><p>在common中添加了mybatis的公共的setting配置，还需要在需要使用数据源的项目中对Mybatis进行配置，在mybatis配置类上引入需要的数据源，如mysql则引入<code>@Import({ DataBaseMysqlConfiguration.class })</code>，设置mybatis的mapper的包配置<code>@MapperScan(basePackages = { &quot;com.ule.wholesale.fxpurchase.server.mapper&quot; })</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@Import(&#123; DataBaseMysqlConfiguration.class &#125;)</div><div class="line">@MapperScan(basePackages = &#123; &quot;com.ule.wholesale.fxpurchase.server.mapper&quot; &#125;)</div><div class="line">@EnableTransactionManagement</div><div class="line">public class MybatisConfiguration implements EnvironmentAware,</div><div class="line">		TransactionManagementConfigurer &#123;</div><div class="line"></div><div class="line">	private static Logger logger = LoggerFactory</div><div class="line">			.getLogger(MybatisConfiguration.class);</div><div class="line"></div><div class="line">	private RelaxedPropertyResolver propertyResolver;</div><div class="line"></div><div class="line">	@Resource(name = &quot;dataSource&quot;)</div><div class="line">	private DataSource dataSource;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void setEnvironment(Environment env) &#123;</div><div class="line">		this.propertyResolver = new RelaxedPropertyResolver(env, &quot;mybatis.&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	@ConditionalOnMissingBean</div><div class="line">	public SqlSessionFactory sqlSessionFactory() &#123;</div><div class="line">		try &#123;</div><div class="line">			SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();</div><div class="line">			// dataSource = SpringBeanUtil.getBean(DataSource.class);</div><div class="line">			sessionFactory.setDataSource(dataSource);</div><div class="line">			sessionFactory.setTypeAliasesPackage(propertyResolver.getProperty(&quot;typeAliasesPackage&quot;));</div><div class="line">			sessionFactory</div><div class="line">					.setMapperLocations(new PathMatchingResourcePatternResolver()</div><div class="line">							.getResources(propertyResolver</div><div class="line">									.getProperty(&quot;mapperLocations&quot;)));</div><div class="line">			sessionFactory</div><div class="line">					.setConfigLocation(new DefaultResourceLoader()</div><div class="line">							.getResource(propertyResolver</div><div class="line">									.getProperty(&quot;configLocation&quot;)));</div><div class="line"></div><div class="line">			return sessionFactory.getObject();</div><div class="line">		&#125; catch (Exception e) &#123;</div><div class="line">			logger.warn(&quot;Could not confiure mybatis session factory&quot;);</div><div class="line">			e.printStackTrace();</div><div class="line">			return null;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	public SqlSessionTemplate sqlSessionTemplate(</div><div class="line">			SqlSessionFactory sqlSessionFactory) &#123;</div><div class="line">		return new SqlSessionTemplate(sqlSessionFactory);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	@ConditionalOnMissingBean</div><div class="line">	public DataSourceTransactionManager transactionManager() &#123;</div><div class="line">		return new DataSourceTransactionManager(dataSource);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public PlatformTransactionManager annotationDrivenTransactionManager() &#123;</div><div class="line">		return new DataSourceTransactionManager(dataSource);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean//引入分页插件</div><div class="line">	public PageHelper pageHelper() &#123;</div><div class="line">		logger.info(&quot;MyBatisConfiguration.pageHelper()&quot;);</div><div class="line">		PageHelper pageHelper = new PageHelper();</div><div class="line">		Properties p = new Properties();</div><div class="line">		p.setProperty(&quot;dialect&quot;, &quot;mysql&quot;);</div><div class="line">		p.setProperty(&quot;offsetAsPageNum&quot;, &quot;false&quot;);</div><div class="line">		p.setProperty(&quot;rowBoundsWithCount&quot;, &quot;false&quot;);</div><div class="line">		p.setProperty(&quot;pageSizeZero&quot;, &quot;true&quot;);</div><div class="line">		p.setProperty(&quot;reasonable&quot;, &quot;false&quot;);</div><div class="line">		p.setProperty(&quot;supportMethodsArguments&quot;, &quot;false&quot;);</div><div class="line">		p.setProperty(&quot;returnPageInfo&quot;, &quot;none&quot;);</div><div class="line">		pageHelper.setProperties(p);</div><div class="line">		return pageHelper;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>如需分页操作引入分页插件，代码如上</p>
+</li>
+</ol>
+</blockquote>
+<h2 id="Swagger2配置"><a href="#Swagger2配置" class="headerlink" title="Swagger2配置"></a>Swagger2配置</h2><p>rest服务建议引入Swagger2的配置，只需要两部操作，如需更详细的配置，需要到对应的类中通过注解进行配置</p>
+<blockquote>
+<ol>
+<li><p>引入jar</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;io.springfox&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;springfox-swagger2&lt;/artifactId&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;io.springfox&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;springfox-swagger-ui&lt;/artifactId&gt;</div><div class="line">		&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>相关配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">@Configuration</div><div class="line">@EnableSwagger2</div><div class="line">public class Swagger2 &#123;</div><div class="line"></div><div class="line">    @Bean</div><div class="line">    public Docket createRestApi() &#123;</div><div class="line">        return new Docket(DocumentationType.SWAGGER_2)</div><div class="line">                .apiInfo(apiInfo())</div><div class="line">                .select()</div><div class="line">                .apis(RequestHandlerSelectors.basePackage(&quot;server接口的包路径&quot;))</div><div class="line">                .paths(PathSelectors.any())</div><div class="line">                .build();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private ApiInfo apiInfo() &#123;</div><div class="line">        return new ApiInfoBuilder()</div><div class="line">                .title(&quot;Spring Boot中使用Swagger2构建RESTful APIs&quot;)</div><div class="line">                .version(&quot;1.0&quot;)</div><div class="line">                .build();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h2 id="添加自己的过滤器"><a href="#添加自己的过滤器" class="headerlink" title="添加自己的过滤器"></a>添加自己的过滤器</h2><blockquote>
+<p>比如登录和授权的过滤器和添加Servlet<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@Bean</div><div class="line">	public ServletRegistrationBean initUploadImgServlet() &#123;</div><div class="line">		ServletRegistrationBean registration = new ServletRegistrationBean(new UploadImgServlet());</div><div class="line">		registration.addUrlMappings(&quot;/uploadImgServlet&quot;);</div><div class="line">		return registration;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	@Bean</div><div class="line">	public FilterRegistrationBean userLoginStatusFilter() &#123;</div><div class="line">		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();</div><div class="line">			filterRegistrationBean.setFilter(new UserLoginFilter());</div><div class="line">			filterRegistrationBean.addInitParameter(&quot;exclusions&quot;, &quot;*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*&quot;);</div><div class="line">			filterRegistrationBean.addUrlPatterns(LocalDeveloyEnv.isDev?&quot;&quot;:&quot;/*&quot;);</div><div class="line">		return filterRegistrationBean;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	@Bean</div><div class="line">	public FilterRegistrationBean authorizationFilter() &#123;</div><div class="line">		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();</div><div class="line">			filterRegistrationBean.setFilter(new AuthorizationFilter());</div><div class="line">			filterRegistrationBean.addInitParameter(&quot;exclusions&quot;, &quot;*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*&quot;);</div><div class="line">			filterRegistrationBean.addUrlPatterns(LocalDeveloyEnv.isDev?&quot;&quot;:&quot;/*&quot;);</div><div class="line">		return filterRegistrationBean;</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/01/springboot-redis-key-space-notifications/" rel="next" title="springboot-redis key到期事件通知（消息订阅发布）">
+                <i class="fa fa-chevron-left"></i> springboot-redis key到期事件通知（消息订阅发布）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/head.png"
+               alt="zhengmingzhi" />
+          <p class="site-author-name" itemprop="name">zhengmingzhi</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#公共模块"><span class="nav-number">1.</span> <span class="nav-text">公共模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在当前版本中，公共模块主要包括公共常量、业务中的枚举、数据源配置、SQLFilter、XssShellFilter（防止js、css注入）、常用util、Application父类"><span class="nav-number">1.1.</span> <span class="nav-text">在当前版本中，公共模块主要包括公共常量、业务中的枚举、数据源配置、SQLFilter、XssShellFilter（防止js、css注入）、常用util、Application父类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#业务中的枚举对象，对应已经定义好的枚举值，并且需要多处使用的可以申请放到公共模块中"><span class="nav-number">1.2.</span> <span class="nav-text">业务中的枚举对象，对应已经定义好的枚举值，并且需要多处使用的可以申请放到公共模块中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据源配置，目前定义了单数据源的配置，包括mysql和oracle-下面通过mysql进行说明"><span class="nav-number">1.3.</span> <span class="nav-text">数据源配置，目前定义了单数据源的配置，包括mysql和oracle ,下面通过mysql进行说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入"><span class="nav-number">1.4.</span> <span class="nav-text">SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consul配置"><span class="nav-number">1.5.</span> <span class="nav-text">Consul配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#公共帮助类"><span class="nav-number">1.6.</span> <span class="nav-text">公共帮助类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志文件配置"><span class="nav-number">1.7.</span> <span class="nav-text">日志文件配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他说明"><span class="nav-number">1.8.</span> <span class="nav-text">其他说明</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Rest服务实现模块"><span class="nav-number">2.</span> <span class="nav-text">Rest服务实现模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Consul初始化"><span class="nav-number">2.1.</span> <span class="nav-text">Consul初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mybatis配置"><span class="nav-number">2.2.</span> <span class="nav-text">Mybatis配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swagger2配置"><span class="nav-number">2.3.</span> <span class="nav-text">Swagger2配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加自己的过滤器"><span class="nav-number">2.4.</span> <span class="nav-text">添加自己的过滤器</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhengmingzhi</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
