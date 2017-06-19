@@ -97,7 +97,7 @@
 <meta property="og:site_name" content="学武之境">
 <meta property="og:description" content="前面介绍过，spring cloud项目是基于spring boot的，本篇文章是对spring boot和cloud常用配置进行简单提取、封装和约定，主要包括数据源配置、mybatis配置、常量、公共帮助类、consul的配置、公共过滤器等功能配置。公共配置将以jar包形式提供。如果有更好的封装和配置，将在后续文章中进行介绍。">
 <meta property="og:image" content="http://yoursite.com/images/bootstrap-1.jpg">
-<meta property="og:updated_time" content="2017-06-16T10:01:24.899Z">
+<meta property="og:updated_time" content="2017-06-19T04:51:44.582Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="springCloud进阶">
 <meta name="twitter:description" content="前面介绍过，spring cloud项目是基于spring boot的，本篇文章是对spring boot和cloud常用配置进行简单提取、封装和约定，主要包括数据源配置、mybatis配置、常量、公共帮助类、consul的配置、公共过滤器等功能配置。公共配置将以jar包形式提供。如果有更好的封装和配置，将在后续文章中进行介绍。">
@@ -342,6 +342,9 @@
 </li>
 </ol>
 </blockquote>
+<ol>
+<li>配置文件值映射到类中方法，一是通过set方法注入，二是通过实现EnvironmentAware进行处理，方式二参照上面数据源配置类，方式一参照 <code>JDBC2MysqlConfiguration</code>类。对于常量类的配置，可以通过@Value来赋值，@Value不能直接为静态变量赋值，所以要通过set方法实现，把@Value写到对应的set方法上，set方法不能是静态的</li>
+</ol>
 <h2 id="SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入"><a href="#SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入" class="headerlink" title="SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入"></a>SQLFilter、XssShellFilter用来防止sql注入和前端的css、js等的注入</h2><blockquote>
 <ol>
 <li><p>SqlFilter 验证如下：</p>
@@ -393,6 +396,10 @@
 <tr>
 <td style="text-align:left">ResultDTO<t></t></td>
 <td style="text-align:left">所有rest接口统一返回对象</td>
+</tr>
+<tr>
+<td style="text-align:left">LocalDeveloyEnv</td>
+<td style="text-align:left">判断是否为dev开发的一个常量，可以在本地服务启动时添加系统变量 <code>dev=true</code> ，有些逻辑或验证在开发时不需要使用，可以使用类中的isDev进行判断，目的是：提交代码无需修改，所有项目建议用spring-boot:run 命令进行启动，在命令下方设置dev变量</td>
 </tr>
 </tbody>
 </table>
